@@ -281,7 +281,7 @@ public class PartRepositoryClient{
       for (Part part : partList) {
         if(part.getPartId().toString().equals(partId)){
           return part;
-        }        
+        }
       }
       return null;
     }catch (Exception e){
