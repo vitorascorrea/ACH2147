@@ -14,7 +14,8 @@ public interface Part extends Remote{
   public void setPartDescription(String description) throws RemoteException;
 
   public ArrayList<Part> getSubParts() throws RemoteException;
-  public void pushNewSubPart(String name, String description) throws RemoteException;
-  public void pushExistingSubPart(Part part) throws RemoteException;
+  public int getSubPartQuant(int index) throws RemoteException;
+  public void pushNewSubPart(String name, String description, int quant) throws RemoteException;
+  public void pushExistingSubPart(Part part, int quant) throws RemoteException;
 
 }

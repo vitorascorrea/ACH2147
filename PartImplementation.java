@@ -9,6 +9,7 @@ public class PartImplementation extends UnicastRemoteObject implements Part{
   String name;
   String description;
   ArrayList<Part> subParts = new ArrayList<Part>();
+  ArrayList<Integer> subPartsQuant = new ArrayList<Integer>();
 
   protected PartImplementation() throws RemoteException{
     super();
@@ -38,14 +39,20 @@ public class PartImplementation extends UnicastRemoteObject implements Part{
     return this.subParts;
   }
 
-  public void pushExistingSubPart(Part part) throws RemoteException{
-    this.subParts.add(part);
+  public int getSubPartQuant(int index) throws RemoteException{
+    return this.subPartsQuant.get(index);
   }
 
-  public void pushNewSubPart(String name, String description) throws RemoteException{
+  public void pushExistingSubPart(Part part, int quant) throws RemoteException{
+    this.subParts.add(part);
+    this.subPartsQuant.add(quant);
+  }
+
+  public void pushNewSubPart(String name, String description, int quant) throws RemoteException{
     Part newSubPart = new PartImplementation();
     newSubPart.setPartName(name);
     newSubPart.setPartDescription(description);
     this.subParts.add(newSubPart);
+    this.subPartsQuant.add(quant);
   }
 }

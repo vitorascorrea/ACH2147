@@ -8,20 +8,21 @@ import java.rmi.registry.LocateRegistry;
 public class PartRepositoryClient{
 
   public static void main(String[] args){
-
     try{
+
       PartRepository pr = (PartRepository) Naming.lookup("//localhost:" + args[1] + "/" + args[0]);
-      Part foundedPart = null;
+      Part currentPart = null;
       Scanner sc = new Scanner(System.in);
+
       while(true){
-        System.out.println();
+        clearScreen();
         System.out.println("Repositório: " + pr.getRepositoryName());
-        if(foundedPart != null){
-          System.out.println("Peça selecionada: " + foundedPart.getPartName() + " - " + foundedPart.getPartId());
+        if(currentPart != null){
+          System.out.println("Peça selecionada: " + currentPart.getPartName() + " - " + currentPart.getPartId());
         }
-        System.out.println();
+        System.out.println("///////////////////////////////////////////////");
         System.out.println("O que deseja fazer? (insira o número correspondente)");
-        if(foundedPart != null){
+        if(currentPart != null){
           System.out.println("[0 - Manipular peça selecionada]");
         }
         System.out.println("[1 - Listar peças do repositório]");
@@ -30,145 +31,247 @@ public class PartRepositoryClient{
         System.out.println("[4 - Alterar o nome do repositório]");
         System.out.println("[5 - Conectar em outro repositório]");
         System.out.println("[6 - Encerrar a sessão]");
-        System.out.println();
+        System.out.println("///////////////////////////////////////////////");
+        System.out.print(">");
         int option = sc.nextInt();
         System.out.println();
         switch (option) {
-            case 0:
-              if(foundedPart != null){
-                System.out.println("O que você deseja fazer com a peça selecionada?");
-                System.out.println("[1 - Alterar o nome da peça]");
-                System.out.println("[2 - Alterar a descrição da peça]");
-                System.out.println("[3 - Manipular subpeças da peça]");
-                System.out.println("[4 - Retornar ao menu anterior]");
-                int partOption = sc.nextInt();
-                if(partOption == 1){
-                  System.out.println("Nome atual da peça: " + foundedPart.getPartName());
-                  System.out.print("Novo nome da peça: ");
-                  String newPartName = sc.next();
-                  foundedPart.setPartName(newPartName);
-                }else if(partOption == 2){
-                  System.out.println("Descrição atual da peça: " + foundedPart.getPartDescription());
-                  System.out.print("Nova descrição da peça: ");
-                  String newPartDescription = sc.next();
-                  foundedPart.setPartDescription(newPartDescription);
-                }else if(partOption == 3){
-                  while(true){
-                    System.out.println("O que deseja fazer com a lista de subpeças da peça " + foundedPart.getPartName() + " - " + foundedPart.getPartId());
-                    System.out.println("[1 - Listar subpeças]");
-                    System.out.println("[2 - Adicionar uma nova subpeça]");
-                    System.out.println("[3 - Adicionar uma peça existente como subpeça]");
-                    System.out.println("[4 - Retornar ao menu anterior]");
-                    int subPartOption = sc.nextInt();
-                    if(subPartOption == 1){
-                      if(foundedPart.getSubParts().size() > 0){
-                        System.out.println("As subpeças são:");
-                        System.out.println("ID                   -   Nome da Subpeça   -   Descrição da Subpeça");
-                        for (Part subPart : foundedPart.getSubParts()) {
-                          System.out.println(subPart.getPartId() + " - " + subPart.getPartName() + " - " + subPart.getPartDescription());
-                        }
-                      }else{
-                        System.out.println("Não existem subpeças para esta peça");
-                      }
-                    }else if(subPartOption == 2){
-                      System.out.println("Criando uma nova subpeça");
-                      System.out.print("Nome: ");
-                      String subPartName = sc.next();
-                      System.out.print("Descrição: ");
-                      String subPartDescription = sc.next();
-                      foundedPart.pushNewSubPart(subPartName, subPartDescription);
-                      System.out.println();
-                    }else if(subPartOption == 3){
-                      System.out.println("Qual o repositório em que a peça está localizada?");
-                      String subPartRep = sc.next();
-                      System.out.println("Qual o número da porta do repositório em que a peça está localizada?");
-                      String subPartRepPort = sc.next();
-                      try{
-                        PartRepository tempPr = (PartRepository) Naming.lookup("//localhost:" + subPartRepPort + "/" + subPartRep);
-                        System.out.print("Digite o ID da peça: ");
-                        String subPartId = sc.next();
-                        if(!foundedPart.getPartId().toString().equals(findPartById(subPartId, tempPr.getRepositoryParts()).getPartId().toString())){
-                          foundedPart.pushExistingSubPart(findPartById(subPartId, tempPr.getRepositoryParts()));
-                        }else{
-                          System.out.println();
-                          System.out.println("Uma peça não pode ser subpeça direta de si mesma.");
-                          System.out.println();
-                        }
-                      }catch(Exception e){
-                        System.out.println("Não foi encontrado nenhum repositorio com esses parâmetros ou nenhuma peça.");
+          case 0:
+            if(currentPart != null){
+              clearScreen();
+              System.out.println("///////////////////////////////////////////////");
+              System.out.println("O que você deseja fazer com a peça selecionada? (insira o número correspondente)");
+              System.out.println("[1 - Alterar o nome da peça]");
+              System.out.println("[2 - Alterar a descrição da peça]");
+              System.out.println("[3 - Manipular subpeças da peça]");
+              System.out.println("[4 - Retornar ao menu anterior]");
+              System.out.println("///////////////////////////////////////////////");
+              System.out.print(">");
+              int partOption = sc.nextInt();
+              if(partOption == 1){
+                System.out.println("///////////////////////////////////////////////");
+                System.out.println("Nome atual da peça: " + currentPart.getPartName());
+                System.out.print("Novo nome da peça: ");
+                String newPartName = sc.next();
+                currentPart.setPartName(newPartName);
+              }else if(partOption == 2){
+                System.out.println("///////////////////////////////////////////////");
+                System.out.println("Descrição atual da peça: " + currentPart.getPartDescription());
+                System.out.print("Nova descrição da peça: ");
+                String newPartDescription = sc.next();
+                currentPart.setPartDescription(newPartDescription);
+              }else if(partOption == 3){
+                while(true){
+                  clearScreen();
+                  System.out.println("///////////////////////////////////////////////");
+                  System.out.println("O que deseja fazer com a lista de subpeças da peça " + currentPart.getPartName() + " - " + currentPart.getPartId() + " (insira o número correspondente)");
+                  System.out.println("[1 - Listar subpeças]");
+                  System.out.println("[2 - Adicionar uma nova subpeça]");
+                  System.out.println("[3 - Adicionar uma peça existente como subpeça]");
+                  System.out.println("[4 - Retornar ao menu anterior]");
+                  System.out.println("///////////////////////////////////////////////");
+                  System.out.print(">");
+                  int subPartOption = sc.nextInt();
+                  if(subPartOption == 1){
+                    clearScreen();
+                    if(currentPart.getSubParts().size() > 0){
+                      System.out.println("///////////////////////////////////////////////");
+                      System.out.println("As subpeças são:");
+                      System.out.println("ID                   -   Nome da Subpeça   -   Descrição da Subpeça    - Quantidade da Subpeça");
+                      int index = 0;
+                      for (Part subPart : currentPart.getSubParts()) {
+                        System.out.println(subPart.getPartId() + " - " + subPart.getPartName() + " - " + subPart.getPartDescription() + " - " + currentPart.getSubPartQuant(index));
+                        index++;
                       }
                     }else{
-                      break;
+                      System.out.println("///////////////////////////////////////////////");
+                      System.out.println("Não existem subpeças para esta peça");
                     }
+                    System.out.println("///////////////////////////////////////////////");
+                    System.out.println("Pressione ENTER para voltar.");
+                    sc.nextLine();
+                    sc.nextLine();
+                  }else if(subPartOption == 2){
+                    clearScreen();
+                    System.out.println("///////////////////////////////////////////////");
+                    System.out.println("Criando uma nova subpeça");
+                    System.out.print("Nome: ");
+                    String subPartName = sc.next();
+                    System.out.print("Descrição: ");
+                    String subPartDescription = sc.next();
+                    System.out.print("Quantidade: ");
+                    int subPartQuant = sc.nextInt();
+                    currentPart.pushNewSubPart(subPartName, subPartDescription, subPartQuant);
+                  }else if(subPartOption == 3){
+                    clearScreen();
+                    System.out.println("///////////////////////////////////////////////");
+                    System.out.println("Qual o repositório em que a peça está localizada?");
+                    String subPartRep = sc.next();
+                    System.out.println("Qual o número da porta do repositório em que a peça está localizada?");
+                    String subPartRepPort = sc.next();
+                    try{
+                      PartRepository tempPr = (PartRepository) Naming.lookup("//localhost:" + subPartRepPort + "/" + subPartRep);
+                      System.out.println("As peça encontradas neste repositório foram: ");
+                      System.out.println("ID                   -   Nome da Peça   -   Descrição da Peça");
+                      for (Part part : tempPr.getRepositoryParts()) {
+                        System.out.println(part.getPartId() + " - " + part.getPartName() + " - " + part.getPartDescription());
+                        if(part.getSubParts().size() > 0){
+                          System.out.println("> Subpeças de " + part.getPartName());
+                          System.out.println("> ID                   -   Nome da Subpeça   -   Descrição da Subpeça");
+                          for (Part subPart : part.getSubParts()) {
+                            System.out.println("> " + subPart.getPartId() + " - " + subPart.getPartName() + " - " + subPart.getPartDescription());
+                          }
+                        }
+                      }
+                      System.out.print("Digite o ID da peça: ");
+                      String subPartId = sc.next();
+                      Part foundedPart = findPartById(subPartId, tempPr.getRepositoryParts());
+                      if(foundedPart == null){
+                        for (Part part : tempPr.getRepositoryParts()) {
+                          if(part.getSubParts().size() > 0 && findPartById(subPartId, part.getSubParts()) != null){
+                            foundedPart = findPartById(subPartId, part.getSubParts());
+                          }
+                        }
+                      }
+                      if(foundedPart != null && !currentPart.getPartId().toString().equals(foundedPart.getPartId().toString())){
+                        System.out.print("Digite a quantidade: ");
+                        int tempSubPartQuant = sc.nextInt();
+                        currentPart.pushExistingSubPart(foundedPart, tempSubPartQuant);
+                      }else{
+                        System.out.println("///////////////////////////////////////////////");
+                        System.out.println("Peça não encontrada ou tentativa de peça ser subpeça direta de si mesma.");
+                      }
+                    }catch(Exception e){
+                      clearScreen();
+                      System.out.println("///////////////////////////////////////////////");
+                      System.out.println("Não foi encontrado nenhum repositorio com esses parâmetros ou nenhuma peça.");
+                    }
+                    System.out.println("///////////////////////////////////////////////");
+                    System.out.println("Pressione ENTER para voltar.");
+                    sc.nextLine();
+                    sc.nextLine();
+                  }else{
+                    break;
                   }
                 }
               }
-              break;
-            case 1:
-              if(pr.getRepositoryParts().size() > 0){
-                System.out.println("As peças contidas neste repositório são:");
-                System.out.println("ID                   -   Nome da Peça   -   Descrição da peça");
-                for (Part part : pr.getRepositoryParts()) {
-                  System.out.println(part.getPartId() + " - " + part.getPartName() + " - " + part.getPartDescription());
+            }
+            break;
+          case 1:
+            clearScreen();
+            if(pr.getRepositoryParts().size() > 0){
+              System.out.println("///////////////////////////////////////////////");
+              System.out.println("As peças contidas neste repositório são:");
+              System.out.println("ID                   -   Nome da Peça   -   Descrição da Peça");
+              for (Part part : pr.getRepositoryParts()) {
+                System.out.println(part.getPartId() + " - " + part.getPartName() + " - " + part.getPartDescription());
+                if(part.getSubParts().size() > 0){
+                  System.out.println("> Subpeças de " + part.getPartName());
+                  System.out.println("> ID                   -   Nome da Subpeça   -   Descrição da Subpeça - Quantidade da Subpeça");
+                  int index = 0;
+                  for (Part subPart : part.getSubParts()) {
+                    System.out.println("> " + subPart.getPartId() + " - " + subPart.getPartName() + " - " + subPart.getPartDescription() + " - " + part.getSubPartQuant(index));
+                    index++;
+                  }
                 }
-              }else{
-                System.out.println("O repositório está vazio");
               }
-              break;
-            case 2:
-              System.out.println("Pesquisar peça por:");
-              System.out.println("[1 - ID (a peça será selecionada)]");
-              System.out.println("[2 - Nome]");
-              System.out.println("[3 - Retornar ao menu anterior]");
-              int partSearch = sc.nextInt();
-              if(partSearch == 1){
-                System.out.print("Digite o ID da peça: ");
-                String partId = sc.next();
-                foundedPart = findPartById(partId, pr.getRepositoryParts());
-              }else if(partSearch == 2){
-                System.out.print("Digite o Nome da peça: ");
-                String partName = sc.next();
-                findPartByName(partName, pr.getRepositoryParts());
+            }else{
+              System.out.println("///////////////////////////////////////////////");
+              System.out.println("O repositório está vazio");
+            }
+            System.out.println("///////////////////////////////////////////////");
+            System.out.println("Pressione ENTER para voltar.");
+            sc.nextLine();
+            sc.nextLine();
+            break;
+          case 2:
+            clearScreen();
+            System.out.println("///////////////////////////////////////////////");
+            System.out.println("Pesquisar peça por (insira o número correspondente):");
+            System.out.println("[1 - ID (a peça será selecionada)]");
+            System.out.println("[2 - Nome]");
+            System.out.println("[3 - Retornar ao menu anterior]");
+            System.out.println("///////////////////////////////////////////////");
+            System.out.print(">");
+            int partSearch = sc.nextInt();
+            if(partSearch == 1){
+              System.out.println("///////////////////////////////////////////////");
+              System.out.println("As peças contidas neste repositório são:");
+              System.out.println("ID                   -   Nome da Peça   -   Descrição da Peça");
+              for (Part part : pr.getRepositoryParts()) {
+                System.out.println(part.getPartId() + " - " + part.getPartName() + " - " + part.getPartDescription());
+                if(part.getSubParts().size() > 0){
+                  System.out.println("> Subpeças de " + part.getPartName());
+                  System.out.println("> ID                   -   Nome da Subpeça   -   Descrição da Subpeça - Quantidade da Subpeça");
+                  int index = 0;
+                  for (Part subPart : part.getSubParts()) {
+                    System.out.println("> " + subPart.getPartId() + " - " + subPart.getPartName() + " - " + subPart.getPartDescription() + " - " + part.getSubPartQuant(index));
+                    index++;
+                  }
+                }
               }
-              System.out.println();
-              break;
-            case 3:
-              System.out.println("Criando uma nova peça");
-              System.out.print("Nome: ");
+              System.out.println("///////////////////////////////////////////////");
+              System.out.print("Digite o ID da peça: ");
+              String partId = sc.next();
+              currentPart = findPartById(partId, pr.getRepositoryParts());
+            }else if(partSearch == 2){
+              System.out.println("///////////////////////////////////////////////");
+              System.out.print("Digite o Nome da peça: ");
               String partName = sc.next();
-              System.out.print("Descrição: ");
-              String partDescription = sc.next();
-              foundedPart = pr.pushNewPart(partName, partDescription);
-              System.out.println();
-              break;
-            case 4:
-              System.out.println("Qual o nome novo do repositório?");
-              String name = sc.next();
-              pr.setRepositoryName(name);
-              System.out.println();
-              break;
-            case 5:
-              System.out.print("Insira o nome do repositório à ser conectado: ");
-              String repName = sc.next();
-              System.out.print("Insira o número da porta do repositório à ser conectado: ");
-              int repPort = sc.nextInt();
-              try{
-                pr = (PartRepository) Naming.lookup("//localhost:" + repPort + "/" + repName);
-              }catch(Exception e){
-                System.out.println("Não foi encontrado nenhum repositorio com esses parâmetros");
-              }
-              break;
-            case 6:
-              return;
-            default:
-              System.out.println("Opção inválida");
-              System.out.println();
-              break;
+              findPartByName(partName, pr.getRepositoryParts());
+              System.out.println("///////////////////////////////////////////////");
+              System.out.println("Pressione ENTER para voltar.");
+              sc.nextLine();
+              sc.nextLine();
+            }
+            System.out.println();
+            break;
+          case 3:
+            clearScreen();
+            System.out.println("///////////////////////////////////////////////");
+            System.out.println("Criando uma nova peça");
+            System.out.print("Nome: ");
+            String partName = sc.next();
+            System.out.print("Descrição: ");
+            String partDescription = sc.next();
+            currentPart = pr.pushNewPart(partName, partDescription);
+            System.out.println();
+            break;
+          case 4:
+            clearScreen();
+            System.out.println("///////////////////////////////////////////////");
+            System.out.println("Qual o nome novo do repositório?");
+            String name = sc.next();
+            pr.setRepositoryName(name);
+            System.out.println();
+            break;
+          case 5:
+            clearScreen();
+            System.out.println("///////////////////////////////////////////////");
+            System.out.print("Insira o nome do repositório à ser conectado: ");
+            String repName = sc.next();
+            System.out.print("Insira o número da porta do repositório à ser conectado: ");
+            int repPort = sc.nextInt();
+            try{
+              pr = (PartRepository) Naming.lookup("//localhost:" + repPort + "/" + repName);
+            }catch(Exception e){
+              System.out.println("///////////////////////////////////////////////");
+              System.out.println("Não foi encontrado nenhum repositorio com esses parâmetros");
+            }
+            break;
+          case 6:
+            return;
+          default:
+            System.out.println("///////////////////////////////////////////////");
+            System.out.println("Opção inválida");
+            System.out.println();
+            break;
         }
 
       }
     }
     catch (Exception e){
+      System.out.println(e);
       System.out.println("Não foi inserido repositório ou porta válidos.");
     }
   }
@@ -177,12 +280,9 @@ public class PartRepositoryClient{
     try{
       for (Part part : partList) {
         if(part.getPartId().toString().equals(partId)){
-          System.out.println("ID                   -   Nome da Peça   -   Descrição da peça");
-          System.out.println(part.getPartId() + " - " + part.getPartName() + " - " + part.getPartDescription());
           return part;
-        }
+        }        
       }
-      System.out.print("Não foi encontrado nenhuma peça com o ID " + partId);
       return null;
     }catch (Exception e){
       return null;
@@ -206,10 +306,19 @@ public class PartRepositoryClient{
         }
       }
       if(!found){
-        System.out.print("Não foi encontrado nenhuma peça com o Nome " + partName);
+        System.out.println("Não foi encontrado nenhuma peça com o Nome " + partName);
       }
     }catch (Exception e){
 
+    }
+  }
+
+  public static void clearScreen(){
+    try{
+      System.out.print("\033[H\033[2J");
+      System.out.flush();
+    }catch (Exception e){
+      System.out.println();
     }
   }
 
