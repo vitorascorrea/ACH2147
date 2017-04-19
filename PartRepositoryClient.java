@@ -28,9 +28,8 @@ public class PartRepositoryClient{
         System.out.println("[1 - Listar peças do repositório]");
         System.out.println("[2 - Buscar ou selecionar uma peça no repositório]");
         System.out.println("[3 - Adicionar uma peça ao repositório]");
-        System.out.println("[4 - Alterar o nome do repositório]");
-        System.out.println("[5 - Conectar em outro repositório]");
-        System.out.println("[6 - Encerrar a sessão]");
+        System.out.println("[4 - Conectar em outro repositório]");
+        System.out.println("[5 - Encerrar a sessão]");
         System.out.println("///////////////////////////////////////////////");
         System.out.print(">");
         int option = sc.nextInt();
@@ -51,14 +50,16 @@ public class PartRepositoryClient{
               if(partOption == 1){
                 System.out.println("///////////////////////////////////////////////");
                 System.out.println("Nome atual da peça: " + currentPart.getPartName());
-                System.out.print("Novo nome da peça: ");
-                String newPartName = sc.next();
+                System.out.println("Novo nome da peça: ");
+                sc.nextLine();
+                String newPartName = sc.nextLine();
                 currentPart.setPartName(newPartName);
               }else if(partOption == 2){
                 System.out.println("///////////////////////////////////////////////");
                 System.out.println("Descrição atual da peça: " + currentPart.getPartDescription());
-                System.out.print("Nova descrição da peça: ");
-                String newPartDescription = sc.next();
+                System.out.println("Nova descrição da peça: ");
+                sc.nextLine();
+                String newPartDescription = sc.nextLine();
                 currentPart.setPartDescription(newPartDescription);
               }else if(partOption == 3){
                 while(true){
@@ -95,20 +96,22 @@ public class PartRepositoryClient{
                     clearScreen();
                     System.out.println("///////////////////////////////////////////////");
                     System.out.println("Criando uma nova subpeça");
-                    System.out.print("Nome: ");
-                    String subPartName = sc.next();
-                    System.out.print("Descrição: ");
-                    String subPartDescription = sc.next();
-                    System.out.print("Quantidade: ");
+                    System.out.println("Nome: ");
+                    sc.nextLine();
+                    String subPartName = sc.nextLine();
+                    System.out.println("Descrição: ");
+                    String subPartDescription = sc.nextLine();
+                    System.out.println("Quantidade: ");
                     int subPartQuant = sc.nextInt();
                     currentPart.pushNewSubPart(subPartName, subPartDescription, subPartQuant);
                   }else if(subPartOption == 3){
                     clearScreen();
                     System.out.println("///////////////////////////////////////////////");
                     System.out.println("Qual o repositório em que a peça está localizada?");
-                    String subPartRep = sc.next();
+                    sc.nextLine();
+                    String subPartRep = sc.nextLine();
                     System.out.println("Qual o número da porta do repositório em que a peça está localizada?");
-                    String subPartRepPort = sc.next();
+                    String subPartRepPort = sc.nextLine();
                     try{
                       PartRepository tempPr = (PartRepository) Naming.lookup("//localhost:" + subPartRepPort + "/" + subPartRep);
                       System.out.println("As peça encontradas neste repositório foram: ");
@@ -123,8 +126,8 @@ public class PartRepositoryClient{
                           }
                         }
                       }
-                      System.out.print("Digite o ID da peça: ");
-                      String subPartId = sc.next();
+                      System.out.println("Digite o ID da peça: ");
+                      String subPartId = sc.nextLine();
                       Part foundedPart = findPartById(subPartId, tempPr.getRepositoryParts());
                       if(foundedPart == null){
                         for (Part part : tempPr.getRepositoryParts()) {
@@ -211,13 +214,15 @@ public class PartRepositoryClient{
                 }
               }
               System.out.println("///////////////////////////////////////////////");
-              System.out.print("Digite o ID da peça: ");
-              String partId = sc.next();
+              System.out.println("Digite o ID da peça: ");
+              sc.nextLine();
+              String partId = sc.nextLine();
               currentPart = findPartById(partId, pr.getRepositoryParts());
             }else if(partSearch == 2){
               System.out.println("///////////////////////////////////////////////");
-              System.out.print("Digite o Nome da peça: ");
-              String partName = sc.next();
+              System.out.println("Digite o Nome da peça: ");
+              sc.nextLine();
+              String partName = sc.nextLine();
               findPartByName(partName, pr.getRepositoryParts());
               System.out.println("///////////////////////////////////////////////");
               System.out.println("Pressione ENTER para voltar.");
@@ -230,36 +235,36 @@ public class PartRepositoryClient{
             clearScreen();
             System.out.println("///////////////////////////////////////////////");
             System.out.println("Criando uma nova peça");
-            System.out.print("Nome: ");
-            String partName = sc.next();
-            System.out.print("Descrição: ");
-            String partDescription = sc.next();
+            System.out.println("Nome: ");
+            sc.nextLine();
+            String partName = sc.nextLine();
+            System.out.println("Descrição: ");
+            String partDescription = sc.nextLine();
             currentPart = pr.pushNewPart(partName, partDescription);
-            System.out.println();
             break;
           case 4:
             clearScreen();
             System.out.println("///////////////////////////////////////////////");
-            System.out.println("Qual o nome novo do repositório?");
-            String name = sc.next();
-            pr.setRepositoryName(name);
-            System.out.println();
-            break;
-          case 5:
-            clearScreen();
-            System.out.println("///////////////////////////////////////////////");
-            System.out.print("Insira o nome do repositório à ser conectado: ");
+            System.out.println("Insira o nome do repositório à ser conectado: ");
             String repName = sc.next();
-            System.out.print("Insira o número da porta do repositório à ser conectado: ");
+            System.out.println("Insira o número da porta do repositório à ser conectado: ");
             int repPort = sc.nextInt();
+            boolean success = false;
             try{
-              pr = (PartRepository) Naming.lookup("//localhost:" + repPort + "/" + repName);
+              PartRepository check = (PartRepository) Naming.lookup("//localhost:" + repPort + "/" + repName);
+              success = true;
             }catch(Exception e){
               System.out.println("///////////////////////////////////////////////");
-              System.out.println("Não foi encontrado nenhum repositorio com esses parâmetros");
+              System.out.println("Não foi encontrado nenhum repositorio com esses parâmetros. Voltando ao repositório anterior.");
+              System.out.println("///////////////////////////////////////////////");
+              System.out.println("Pressione ENTER para voltar.");
+              sc.nextLine();
+              sc.nextLine();
+            }finally{
+              if(success) pr = (PartRepository) Naming.lookup("//localhost:" + repPort + "/" + repName);
             }
             break;
-          case 6:
+          case 5:
             return;
           default:
             System.out.println("///////////////////////////////////////////////");
